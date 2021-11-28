@@ -25,7 +25,7 @@ def getPosts(url):
         title = link.replace('http://www.panorama.com.al/',
                              '').replace('/', '')
         # define News object and append to list
-        news = News(title, date, link, 'tets', None)
+        news = News(title, None, date, link, 'tets', None)
         # append News object to list
         postsresult.append(news)
     print('Posts found: ' + str(len(postsresult)))
