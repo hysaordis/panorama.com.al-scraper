@@ -1,41 +1,13 @@
 import pymongo
 import getPosts as GetPosts
 import getNews as GetNews
+import category as category
 
-urllist = []
-lajmidundit = ('lajmidundit',
-               'http://www.panorama.com.al/category/lajmi-i-fundit/')
-opinion = ('opinion', 'http://www.panorama.com.al/category/opinion/')
-politike = ('politike', 'http://www.panorama.com.al/category/politike/')
-aktualitet = ('aktualitet', 'http://www.panorama.com.al/category/aktualitet/')
-argument = ('argument', 'http://www.panorama.com.al/category/argument/')
-kronike = ('kronike', 'http://www.panorama.com.al/category/kronike/')
-ekonomi = ('ekonomi', 'http://www.panorama.com.al/category/ekonomi/')
-kosova = ('kosova', 'http://www.panorama.com.al/category/kosova/')
-sport = ('sport', 'http://www.panorama.com.al/category/sport/')
-kulture = ('kulture', 'http://www.panorama.com.al/category/kulture/')
-dossier = ('dossier', 'http://www.panorama.com.al/category/dossier/')
-kuriozitete = ('kuriozitete',
-               'http://www.panorama.com.al/category/kuriozitete/')
-lifestyle = ('lifestyle', 'http://www.panorama.com.al/category/lifestyle/')
-
-# add all urls to urllist
-urllist.append(lajmidundit)
-urllist.append(opinion)
-urllist.append(politike)
-urllist.append(aktualitet)
-urllist.append(argument)
-urllist.append(kronike)
-urllist.append(ekonomi)
-urllist.append(kosova)
-urllist.append(sport)
-urllist.append(kulture)
-urllist.append(dossier)
-urllist.append(kuriozitete)
-urllist.append(lifestyle)
+urllist = category.getAll('http://www.panorama.com.al/')
 
 # connect to mongodb
 client = pymongo.MongoClient("mongodb://localhost:27017/")
+
 # if database panorama doesn't exist, create it
 if not client.panorama:
     client.create_database('panorama')
