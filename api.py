@@ -26,25 +26,12 @@ if not client.panorama.news:
 db = client.panorama
 collection = db.posts
 
-# get route for /api/news with url parameter
-# @app.route('/api/import')
-# def import_news():
-#     # get url from parameter
-#     url = request.args.get('url', default='', type=str)
-#     # get all posts from url
-#     getPosts(url)
-#     # return success message
-#     return jsonify({'message': 'Success'})
-
 
 @app.route("/")
 def GetNews():
     # get last 10 documents from collection first 10 documents
     news = collection.find()
 
-    # news = collection.find().limit(10)
-    # news = collection.find().sort('_id', pymongo.DESCENDING)
-    # iterate through news and get content and images
     newslist = []
     for n in news:
         title = n['title']
