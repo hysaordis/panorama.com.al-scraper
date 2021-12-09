@@ -1,8 +1,8 @@
 import os
 import pymongo
+from numpy import vectorize
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-from sklearn.feature_extraction import text
+from sklearn.metrics.pairwise import cosine_similarity
 
 stopwords = []
 #define stopwords read all line in file stopwords.txt
@@ -49,22 +49,35 @@ for document in collection.find():
 # print found documents count in collection
 print("Found %d documents" % len(documents))
 
-vectorizer = TfidfVectorizer(stop_words=stopwords)
-X = vectorizer.fit_transform(documents)
+# sample_files = [doc for doc in os.listdir() if doc.endswith('.txt')]
 
-true_k = 3
-model = KMeans(init="random",
-               n_clusters=true_k,
-               n_init=10,
-               max_iter=300,
-               random_state=42)
-model.fit(X)
+# read all files with encoding utf-8
+# sample_contents = [open(doc, encoding='utf-8').read() for doc in sample_files]
 
-print("Top terms per cluster:")
-order_centroids = model.cluster_centers_.argsort()[:, ::-1]
-terms = vectorizer.get_feature_names()
-for i in range(true_k):
-    print("Cluster %d:" % i),
-    for ind in order_centroids[i, :10]:
-        print(' %s' % terms[ind]),
-    print()
+vectorize = lambda Text: TfidfVectorizer().fit_transform(Text).toarray()
+similarity = lambda doc1, doc2: cosine_similarity([doc1, doc2])
+
+# vectors = vectorize(sample_contents)
+vectors = vectorize(documents)
+# s_vectors = list(zip(sample_files, vectors))
+s_vectors = list(zip(documents, vectors))
+
+
+def check_plagiarism():
+    results = set()
+    global s_vectors
+    for sample_a, text_vector_a in s_vectors:
+        new_vectors = s_vectors.copy()
+        current_index = new_vectors.index((sample_a, text_vector_a))
+        del new_vectors[current_index]
+        for sample_b, text_vector_b in new_vectors:
+            sim_score = similarity(text_vector_a, text_vector_b)[0][1]
+            sample_pair = sorted((sample_a, sample_b))
+            score = sample_pair[0], sample_pair[1], sim_score
+            results.add(score)
+    return results
+
+
+for data in check_plagiarism():
+    if data[2] > 0.4:
+        print(data)

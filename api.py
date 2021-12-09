@@ -4,7 +4,7 @@ import pymongo
 from Models.NewsModel import News
 from flask import Flask, jsonify, request
 from flask_ngrok import run_with_ngrok
-import app as app
+# import app as app
 import json
 import pymongo
 import getPosts as GetPosts
@@ -12,7 +12,6 @@ import getNews as GetNews
 
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when app is run
-
 # connect to mongodb
 client = pymongo.MongoClient("mongodb://localhost:27017/")
 # if database doesn't exist, create it
@@ -21,11 +20,11 @@ if not client.panorama:
 # if collection doesn't exist, create it
 if not client.panorama.news:
     client.panorama.news = pymongo.collection.Collection(
-        client.panorama, 'news')
+        client.panorama, 'posts')
 
 # define database and collection
 db = client.panorama
-collection = db.news
+collection = db.posts
 
 # get route for /api/news with url parameter
 # @app.route('/api/import')
@@ -40,8 +39,11 @@ collection = db.news
 
 @app.route("/")
 def GetNews():
-    # get last 10 documents from collection
-    news = collection.find().sort('_id', pymongo.DESCENDING)
+    # get last 10 documents from collection first 10 documents
+    news = collection.find()
+
+    # news = collection.find().limit(10)
+    # news = collection.find().sort('_id', pymongo.DESCENDING)
     # iterate through news and get content and images
     newslist = []
     for n in news:

@@ -2,6 +2,12 @@ import pymongo
 import getPosts as GetPosts
 import getNews as GetNews
 import category as category
+import threading
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
+
+# config for scheduler to run every 10 minutes
+scheduler = BackgroundScheduler()
 
 urllist = category.getAll('http://www.panorama.com.al/')
 
@@ -34,10 +40,23 @@ def getNews(category, url):
     print('Done saving ' + str(count) + ' documents')
 
 
-def importAll():
+def getAllNews():
+    # for each url in urllist, create thread and start it
     for category, url in urllist:
-        getNews(category, url)
+        t = threading.Thread(target=getNews, args=(category, url))
+        # print thread name
+        t.start()
+    # print mesage when all threads are done
+    print('All threads are done')
 
 
-# get news from all urls
-importAll()
+# add job to scheduler to run every 10 minutes and start it immediately
+scheduler.add_job(getAllNews, 'interval', minutes=15)
+scheduler.start()
+try:
+    # This is here to simulate application activity (which keeps the main thread alive).
+    while True:
+        time.sleep(10)
+except (KeyboardInterrupt, SystemExit):
+    # Not strictly necessary if daemonic mode is enabled but should be done if possible
+    scheduler.shutdown()
